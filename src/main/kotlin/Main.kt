@@ -15,7 +15,7 @@ suspend fun main() {
     val reader = BufferedReader(InputStreamReader(System.`in`))
 
     println("Specify path of image")
-    val rawFile = reader.readLine()
+    val rawFile = reader.readLine().removePrefix("\"").removeSuffix("\"")
     val file = File(rawFile)
     if (!file.exists()) return println("This path doesn't exist")
 

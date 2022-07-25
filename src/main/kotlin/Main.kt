@@ -7,9 +7,6 @@ import java.io.InputStreamReader
 import java.util.concurrent.ForkJoinPool
 import javax.imageio.ImageIO
 
-/**
- * C:\Users\Marian\Desktop\coolfile.png
- */
 suspend fun main() {
     val scope = CoroutineScope(ForkJoinPool.commonPool().asCoroutineDispatcher())
     val reader = BufferedReader(InputStreamReader(System.`in`))
@@ -25,6 +22,9 @@ suspend fun main() {
     if (iterations <= 0 || iterations > 360) return println("Your iterations have to stay between 1 and 360")
     val increaseHuePerIteration = 1f / iterations
 
+    println("Reverse hue animation? (Y, N)")
+    val reverseHueAnimation = reader.readLine().equals("y", true)
+
     val image = ImageIO.read(file)
     val rainbowImage = BufferedImage(image.width, image.height * iterations, BufferedImage.TYPE_INT_ARGB)
 
@@ -32,7 +32,7 @@ suspend fun main() {
     for (x in 0 until image.width) {
         for (y in 0 until image.height) {
             tasks.add(scope.async {
-                recolourPixel(iterations, increaseHuePerIteration, image, rainbowImage, x, y)
+                recolourPixel(iterations, increaseHuePerIteration, reverseHueAnimation, image, rainbowImage, x, y)
             })
         }
     }
@@ -44,14 +44,15 @@ suspend fun main() {
     println("Done! New file is located at ${newFile.path}")
 }
 
-fun recolourPixel(iterations: Int, increaseHuePerIteration: Float, oldImage: BufferedImage, newImage: BufferedImage, x: Int, y: Int) {
+fun recolourPixel(iterations: Int, increaseHuePerIteration: Float, reverseHueAnimation: Boolean, oldImage: BufferedImage, newImage: BufferedImage, x: Int, y: Int) {
     val pixel = Color(oldImage.getRGB(x, y), true)
     if (pixel.alpha == 0) return
     val hsb = Color.RGBtoHSB(pixel.red, pixel.green, pixel.blue, null)
 
     var currentHue: Float = hsb[0]
     repeat(iterations) { iteration ->
-        currentHue += increaseHuePerIteration
+        if (reverseHueAnimation) currentHue -= increaseHuePerIteration else currentHue += increaseHuePerIteration
+        if (currentHue < 0) currentHue + 1
         if (currentHue > 1) currentHue -= 1
 
         val iterationHeight = iteration * oldImage.height + y

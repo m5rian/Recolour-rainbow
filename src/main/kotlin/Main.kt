@@ -23,7 +23,7 @@ suspend fun main() {
     val rawIterations = reader.readLine()
     val iterations: Int = rawIterations.toIntOrNull() ?: return println("This path doesn't exist")
     if (iterations <= 0 || iterations > 360) return println("Your iterations have to stay between 1 and 360")
-    val increaseHuePerIteration = 360f / iterations
+    val increaseHuePerIteration = 1f / iterations
 
     val image = ImageIO.read(file)
     val rainbowImage = BufferedImage(image.width, image.height * iterations, BufferedImage.TYPE_INT_ARGB)
@@ -48,12 +48,13 @@ fun recolourPixel(iterations: Int, increaseHuePerIteration: Float, oldImage: Buf
     val pixel = Color(oldImage.getRGB(x, y), true)
     if (pixel.alpha == 0) return
     val hsb = Color.RGBtoHSB(pixel.red, pixel.green, pixel.blue, null)
+
     var currentHue: Float = hsb[0]
     repeat(iterations) { iteration ->
         currentHue += increaseHuePerIteration
-        if (currentHue > 360) currentHue -= 360
+        if (currentHue > 1) currentHue -= 1
 
         val iterationHeight = iteration * oldImage.height + y
-        newImage.setRGB(x, iterationHeight, Color.HSBtoRGB(currentHue / 360, hsb[1], hsb[2]))
+        newImage.setRGB(x, iterationHeight, Color.HSBtoRGB(currentHue, hsb[1], hsb[2]))
     }
 }

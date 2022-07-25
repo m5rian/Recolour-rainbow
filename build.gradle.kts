@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.github.m5rian"
-version = "1"
+version = "1.1"
 
 repositories {
     mavenCentral()

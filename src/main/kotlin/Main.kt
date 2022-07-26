@@ -56,6 +56,9 @@ fun recolourPixel(iterations: Int, increaseHuePerIteration: Float, reverseHueAni
         if (currentHue > 1) currentHue -= 1
 
         val iterationHeight = iteration * oldImage.height + y
-        newImage.setRGB(x, iterationHeight, Color.HSBtoRGB(currentHue, hsb[1], hsb[2]))
+        val rgb = Color.HSBtoRGB(currentHue, hsb[1], hsb[2])
+        val ignoreTransparency = Color(rgb, false)
+        val correctTransparency = Color(ignoreTransparency.red, ignoreTransparency.green, ignoreTransparency.blue, pixel.alpha)
+        newImage.setRGB(x, iterationHeight, correctTransparency.rgb)
     }
 }
